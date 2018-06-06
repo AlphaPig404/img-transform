@@ -1,0 +1,24 @@
+{
+  "name": "fl-img-transform",
+  "version": "0.0.3",
+  "description": "vue img-transform",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlphaPig404/img-transform.git"
+  },
+  "keywords": [
+    "vue",
+    "img",
+    "transform"
+  ],
+  "author": "Nuluf",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AlphaPig404/img-transform/issues"
+  },
+  "homepage": "https://github.com/AlphaPig404/img-transform#readme"
+}

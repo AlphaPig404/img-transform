@@ -67,6 +67,8 @@ export default {
       let isMouseDown = false
       let startX, startY
       this.selfData = Object.assign({}, this.data)
+      this.selfData.translateX *= this.width
+      this.selfData.translateY *= this.height
 
       $wrapper.addEventListener('mousedown', (e)=>{
           startX = e.x
@@ -90,7 +92,11 @@ export default {
 
       $wrapper.addEventListener('mouseup', ()=>{
           isMouseDown = false
-          this.$emit('change',this.selfData, this.template)
+          const translateX = this.selfData.translateX/this.width
+          const translateY = this.selfData.translateY/this.height
+          const newData = Object.assign({}, this.selfData, {translateX, translateY})
+
+          this.$emit('change', newData, this.template)
       })
 
       this.html = compile(this.template, this.selfData)
