@@ -1,12 +1,14 @@
 <style scoped>
     .img-wrapper{
-        position: relative;
+        display: inline-block;
         overflow: hidden;
+        cursor: move;
+        border: 1px solid;
     }
 </style>
 
 <template>
-    <div class="img-wrapper" v-html="html" ref="wrapper" :style="{width: `${width}px`, height: `${height}px` }">
+    <div class="img-wrapper" v-html="html" ref="wrapper" :style="{transform: `scale(${wrapperScale})`}">        
     </div>
 </template>
 
@@ -42,16 +44,28 @@ export default {
       },
       template:{
         type: String,
-        default: '<img src="{{imgUrl}}" style="position: absolute;top: 0;left: 0;bottom:0;right:0;width:100%;height:100%;object-fit:cover;transform: translate({{translateX}}px,{{translateY}}px)"><img src="{{modalUrl}}" style="position: absolute;top: 0;left: 0;bottom:0;right:0;width:100%;height:100%">',
+        default: '<div style="position: relative; width:{{modalWidth}}px; height:{{modalHeight}}px;background: url({{modalUrl}}) center no-repeat;background-size: contain"><img src="{{imgUrl}}" style="position: absolute;z-index: -1;top: {{marginTop}}px;left: {{marginLeft}}px;bottom:0;right:0;width:{{flexImgWidth}}px;height:{{flexImgHeight}}px;transform: translate({{translateX}}px,{{translateY}}px) scale({{scale}});"></div>',
       },
       data: {
         type: Object,
         default: function(){
             return {
-                imgUrl: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1527594868974&di=824eebc4833a2a17fcc775a52327577a&imgtype=0&src=http%3A%2F%2Fimg.taopic.com%2Fuploads%2Fallimg%2F121029%2F240425-12102920212663.jpg',
-                modalUrl: 'http://oxi280pze.bkt.clouddn.com/WechatIMG392.png',
+                imgUrl: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1528457678683&di=0cd5026ea2686d997f0e11891e763af9&imgtype=0&src=http%3A%2F%2Fimg3.redocn.com%2Ftupian%2F20151026%2Fyingerbaobaogaoqingtupian_5186403.jpg',
+                imgWidth: 1000,
+                imgHeight: 667,
+                flexImgWidth: 610,
+                flexImgHeight: 'auto',
+                modalUrl: 'http://oxi280pze.bkt.clouddn.com/WechatIMG581.png',
+                modalWidth: 750,
+                modalHeight: 750,
+                boxWidth: 610,
+                boxHeight: 400,
+                marginLeft: 70,
+                marginTop: 52,
+
                 translateX: 0,
-                translateY: 0
+                translateY: -10,
+                scale: 1
             }
         }
       }
@@ -59,7 +73,8 @@ export default {
   data(){
     return{
         selfData: {},
-        html: ''
+        html: '',
+        wrapperScale:1
     }
   },
   mounted(){
@@ -67,8 +82,7 @@ export default {
       let isMouseDown = false
       let startX, startY
       this.selfData = Object.assign({}, this.data)
-      this.selfData.translateX *= this.width
-      this.selfData.translateY *= this.height
+      this.wrapperScale = this.width / this.selfData.modalWidth
 
       $wrapper.addEventListener('mousedown', (e)=>{
           startX = e.x
@@ -89,17 +103,35 @@ export default {
           this.html = compile(this.template, this.selfData)
           return false
       })
-
+      
       $wrapper.addEventListener('mouseup', ()=>{
           isMouseDown = false
+          this.$emit('change', this.selfData, this.template)
+      })
+      
+      $wrapper.addEventListener('mousewheel', (e)=>{
+          e.preventDefault()
+          const deltaY = Math.floor(e.deltaY)
+
+          if(deltaY<0 && (this.selfData.scale + deltaY/1000) <= 1){
+              return
+          }
+          this.selfData.scale =  Math.floor(this.selfData.scale*1000 + deltaY)/1000
+          this.html = compile(this.template, this.selfData)
+
+          this.$emit('change', this.selfData, this.template)
+      })
+
+      this.html = compile(this.template, this.selfData)
+  },
+  methods:{
+      formatData(){
           const translateX = this.selfData.translateX/this.width
           const translateY = this.selfData.translateY/this.height
           const newData = Object.assign({}, this.selfData, {translateX, translateY})
 
           this.$emit('change', newData, this.template)
-      })
-
-      this.html = compile(this.template, this.selfData)
+      }
   }
 };
 </script>
