@@ -1,6 +1,6 @@
 {
   "name": "fl-img-transform",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "vue img-transform",
   "main": "index.js",
   "scripts": {
