@@ -4,6 +4,7 @@
         overflow: hidden;
         cursor: move;
         border: 1px solid;
+        transform-origin: 0 0 0;
     }
 </style>
 
@@ -41,6 +42,10 @@ export default {
       height: {
           type: Number,
           default: 500
+      },
+      move:{
+        type: boolean,
+        default: false
       },
       template:{
         type: String,
@@ -83,45 +88,48 @@ export default {
       let startX, startY
       this.selfData = Object.assign({}, this.data)
       this.wrapperScale = this.width / this.selfData.modalWidth
-
-      $wrapper.addEventListener('mousedown', (e)=>{
-          startX = e.x
-          startY = e.y
-          isMouseDown = true
-          this.oldX = this.selfData.translateX
-          this.oldY = this.selfData.translateY 
-      })
-
-      $wrapper.addEventListener('mousemove', (e)=>{
-          if(!isMouseDown){return}
-          e.preventDefault()
-          const translateX = e.x - startX 
-          const translateY = e.y - startY
-          this.selfData.translateX = translateX + this.oldX
-          this.selfData.translateY = translateY + this.oldY
-
-          this.html = compile(this.template, this.selfData)
-          return false
-      })
       
-      $wrapper.addEventListener('mouseup', ()=>{
-          isMouseDown = false
-          this.$emit('change', this.selfData, this.template)
-      })
+      if(this.move){
+        $wrapper.addEventListener('mousedown', (e)=>{
+            startX = e.x
+            startY = e.y
+            isMouseDown = true
+            this.oldX = this.selfData.translateX
+            this.oldY = this.selfData.translateY 
+        })
+
+        $wrapper.addEventListener('mousemove', (e)=>{
+            if(!isMouseDown){return}
+            e.preventDefault()
+            const translateX = e.x - startX 
+            const translateY = e.y - startY
+            this.selfData.translateX = translateX + this.oldX
+            this.selfData.translateY = translateY + this.oldY
+
+            this.html = compile(this.template, this.selfData)
+            return false
+        })
+        
+        $wrapper.addEventListener('mouseup', ()=>{
+            isMouseDown = false
+            this.$emit('change', this.selfData, this.template)
+        })
+        
+        $wrapper.addEventListener('mousewheel', (e)=>{
+            e.preventDefault()
+            const deltaY = Math.floor(e.deltaY)
+
+            if(deltaY<0 && (this.selfData.scale + deltaY/1000) <= 1){
+                return
+            }
+            this.selfData.scale =  Math.floor(this.selfData.scale*1000 + deltaY)/1000
+            this.html = compile(this.template, this.selfData)
+
+            this.$emit('change', this.selfData, this.template)
+        })
+
+      }
       
-      $wrapper.addEventListener('mousewheel', (e)=>{
-          e.preventDefault()
-          const deltaY = Math.floor(e.deltaY)
-
-          if(deltaY<0 && (this.selfData.scale + deltaY/1000) <= 1){
-              return
-          }
-          this.selfData.scale =  Math.floor(this.selfData.scale*1000 + deltaY)/1000
-          this.html = compile(this.template, this.selfData)
-
-          this.$emit('change', this.selfData, this.template)
-      })
-
       this.html = compile(this.template, this.selfData)
   },
   methods:{
