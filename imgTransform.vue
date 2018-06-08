@@ -3,7 +3,6 @@
         display: inline-block;
         overflow: hidden;
         cursor: move;
-        border: 1px solid;
         transform-origin: 0 0 0;
     }
 </style>
