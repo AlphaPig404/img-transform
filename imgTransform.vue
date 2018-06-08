@@ -44,7 +44,7 @@ export default {
           default: 500
       },
       move:{
-        type: boolean,
+        type: Boolean,
         default: false
       },
       template:{
